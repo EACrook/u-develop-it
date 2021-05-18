@@ -24,7 +24,11 @@ const db = mysql.createConnection(
 
 // Get all candidates
 app.get('/api/candidates', (req, res) => {
-  const sql = `SELECT * FROM candidates`;
+  const sql = `SELECT candidates.*, parties.name
+                AS party_name
+                FROM candidates
+                LEFT JOIN parties
+                ON candidates.party_id = parties.id`
 
   db.query(sql, (err, rows) => {
     if (err) {
@@ -40,7 +44,13 @@ app.get('/api/candidates', (req, res) => {
 
 // Get a single candidate
 app.get('/api/candidate/:id', (req, res) => {
-  const sql = `SELECT * FROM candidates WHERE id = ?`;
+  const sql = `SELECT candidates.*,
+                AS party_name
+                FROM candidates 
+                LEFT JOIN parties
+                ON candidates.party_id = parties.id
+                WHERE candidates.id = ?`;
+                // NOTICE!! we are still able to use a WHERE clause, but it needed to be placed at the end of the statement
   const params = [req.params.id];
 
   db.query(sql, params, (err, row) => {
